@@ -2,10 +2,30 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { rateLimiter } from "hono-rate-limiter";
+import { readFileSync } from "fs";
+import { dirname, join } from "path";
+import { fileURLToPath } from "url";
 
 import authRoutes from "./routes/auth.js";
 import historyRoutes from "./routes/history.js";
 import shareRoutes from "./routes/share.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const serveStaticFile = (filePath: string, contentType: string) => {
+  return (c: any) => {
+    try {
+      const content = readFileSync(join(__dirname, "..", "public", filePath));
+      return new Response(content, {
+        headers: { "Content-Type": contentType },
+      });
+    } catch (e) {
+      console.error("File not found:", filePath, e);
+      return c.notFound();
+    }
+  };
+};
 
 const app = new Hono();
 
@@ -37,6 +57,8 @@ app.use(
     credentials: true,
   }),
 );
+
+app.get("/favicon.ico", serveStaticFile("favicon.ico", "image/x-icon"));
 
 app.route("/auth", authRoutes);
 app.route("/history", historyRoutes);

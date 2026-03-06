@@ -1,7 +1,7 @@
 
 import { Hono } from "hono";
-import { supabaseAdmin } from "../db";
-import { requireAuth, type AuthUser } from "../middleware/auth";
+import { supabaseAdmin } from "../db.js";
+import { requireAuth, type AuthUser } from "../middleware/auth.js";
 
 type Variables = {
   user: AuthUser;

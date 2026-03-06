@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { nanoid } from "nanoid";
-import { supabaseAdmin } from "../db";
-import { optionalAuth, requireAuth, type AuthUser } from "../middleware/auth";
+import { supabaseAdmin } from "../db.js";
+import { optionalAuth, type AuthUser } from "../middleware/auth.js";
 
 type Variables = {
   user: AuthUser;

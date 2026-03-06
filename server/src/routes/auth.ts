@@ -1,14 +1,6 @@
-/**
- * Auth routes — GitHub OAuth via Supabase Auth.
- *
- * Flow:
- * 1. Frontend calls GET /auth/github → server redirects to Supabase OAuth
- * 2. Supabase handles GitHub OAuth → redirects to GET /auth/callback
- * 3. Server exchanges code for session → returns tokens to frontend
- */
 import { Hono } from "hono";
-import { supabaseAuth, supabaseAdmin } from "../db";
-import { requireAuth, type AuthUser } from "../middleware/auth";
+import { supabaseAuth, supabaseAdmin } from "../db.js";
+import { requireAuth, type AuthUser } from "../middleware/auth.js";
 
 type Variables = {
   user: AuthUser;
@@ -18,7 +10,6 @@ type Variables = {
 const auth = new Hono<{ Variables: Variables }>();
 
 const FRONTEND_URL = process.env.FRONTEND_URL || "https://codeaura.fun";
-const API_URL = process.env.API_URL || "https://api.codeaura.fun";
 
 /**
  * GET /auth/github — Initiate GitHub OAuth
