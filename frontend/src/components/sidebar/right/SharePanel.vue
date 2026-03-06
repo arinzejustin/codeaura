@@ -8,7 +8,7 @@ import { useThemeStore } from '../../../stores/theme'
 import { useFrameStore } from '../../../stores/frame'
 import { useBackgroundStore } from '../../../stores/background'
 import { useAuthStore } from '../../../stores/auth'
-import { Share2, Copy, Upload, Link, Loader2 } from 'lucide-vue-next'
+import { Share2, Copy, Upload, Loader2 } from 'lucide-vue-next'
 import { toast } from 'vue-sonner'
 
 const editor = useEditorStore()
@@ -19,7 +19,6 @@ const auth = useAuthStore()
 
 const API_URL = import.meta.env.VITE_API_URL || '/api'
 
-const copied = ref(false)
 const jsonCopied = ref(false)
 const importText = ref('')
 const importStatus = ref<'idle' | 'success' | 'error'>('idle')
