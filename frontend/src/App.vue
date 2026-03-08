@@ -12,6 +12,10 @@ import { useHead } from '@unhead/vue'
 import { useExport } from './composables/useExport'
 import { useAuthStore } from './stores/auth'
 import { useHistoryStore } from './stores/history'
+import { useEditorStore } from './stores/editor'
+import { useThemeStore } from './stores/theme'
+import { useBackgroundStore } from './stores/background'
+import { useFrameStore } from './stores/frame'
 
 useHead({
   title: 'CodeAura | Transform Your Code into Beautiful Images',
@@ -42,6 +46,10 @@ import SharePanel from './components/sidebar/right/SharePanel.vue'
 const { exportImage, copyToClipboard } = useExport()
 const auth = useAuthStore()
 const historyStore = useHistoryStore()
+const editorStore = useEditorStore()
+const themeStore = useThemeStore()
+const bgStore = useBackgroundStore()
+const frameStore = useFrameStore()
 const canvasRef = ref<InstanceType<typeof PreviewCanvas> | null>(null)
 
 // Sidebar collapse state
@@ -62,6 +70,7 @@ function checkMobile() {
 const showUserMenu = ref(false)
 
 async function handleExport() {
+  saveToHistory()
   const el = canvasRef.value?.exportRef
   if (el) {
     await exportImage(el)
@@ -97,6 +106,22 @@ async function trySyncHistory() {
   }
 }
 
+function saveToHistory() {
+  if (!editorStore.code.trim()) return
+  historyStore.addEntry({
+    themeId: themeStore.currentThemeId,
+    language: editorStore.language,
+    codePreview: editorStore.code.substring(0, 50).replace(/\s+/g, ' ').trim() + (editorStore.code.length > 50 ? '...' : ''),
+    config: {
+      bg: { ...bgStore.$state },
+      frame: { ...frameStore.$state },
+      theme: themeStore.currentThemeId,
+      code: editorStore.code,
+      language: editorStore.language,
+    }
+  })
+}
+
 function handleKeydown(e: KeyboardEvent) {
   if (e.ctrlKey || e.metaKey) {
     switch (e.key.toLowerCase()) {
@@ -106,6 +131,7 @@ function handleKeydown(e: KeyboardEvent) {
         break
       case 's':
         e.preventDefault()
+        saveToHistory()
         toast.success('Settings auto-saved')
         break
     }
@@ -123,6 +149,16 @@ onMounted(() => {
   checkMobile()
   trySyncHistory()
 
+  // Background auto-save loop
+  let lastSavedSignature = ''
+  autoSaveTimer = setInterval(() => {
+    const currentSignature = editorStore.code.length + themeStore.currentThemeId + bgStore.bgType + frameStore.padding
+    if (currentSignature !== lastSavedSignature) {
+      saveToHistory()
+      lastSavedSignature = currentSignature
+    }
+  }, 30000)
+
   // Notify of auth errors if redirected from failed sign-in
   const params = new URLSearchParams(window.location.search)
   if (params.has('auth_error')) {
@@ -133,7 +169,10 @@ onMounted(() => {
   }
 })
 
+let autoSaveTimer: ReturnType<typeof setInterval>
+
 onUnmounted(() => {
+  clearInterval(autoSaveTimer)
   window.removeEventListener('keydown', handleKeydown)
   window.removeEventListener('resize', checkMobile)
   document.removeEventListener('click', handleClickOutside)
@@ -141,15 +180,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="w-screen h-screen flex flex-col overflow-hidden" style="background: var(--surface-0)">
-    <!-- Animated Background -->
-    <div class="app-bg">
-      <div class="particle" />
-      <div class="particle" />
-      <div class="particle" />
-      <div class="particle" />
-      <div class="particle" />
-    </div>
+  <div class="w-screen h-[100dvh] flex flex-col overflow-hidden" style="background: var(--surface-0)">
+    <!-- Classic Dot Background -->
+    <div class="app-bg"></div>
 
     <!-- Header Bar -->
     <header 
@@ -157,10 +190,10 @@ onUnmounted(() => {
       style="height: var(--header-height); border-bottom: 1px solid var(--border); background: var(--glass-bg); backdrop-filter: blur(20px);"
     >
       <div class="flex items-center gap-2 sm:gap-3">
-        <!-- Sidebar toggle (hidden on mobile) -->
+        <!-- Sidebar toggle -->
         <button 
           @click="leftSidebarOpen = !leftSidebarOpen"
-          class="w-8 h-8 items-center justify-center rounded-lg hover:bg-white/5 transition-colors hidden md:flex"
+          class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/5 transition-colors"
           :style="{ color: leftSidebarOpen ? 'var(--accent)' : 'var(--text-muted)' }"
         >
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -276,10 +309,10 @@ onUnmounted(() => {
           </Transition>
         </div>
 
-        <!-- Right sidebar toggle (hidden on mobile) -->
+        <!-- Right sidebar toggle -->
         <button 
           @click="rightSidebarOpen = !rightSidebarOpen"
-          class="w-8 h-8 items-center justify-center rounded-lg hover:bg-white/5 transition-colors hidden md:flex"
+          class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/5 transition-colors"
           :style="{ color: rightSidebarOpen ? 'var(--accent)' : 'var(--text-muted)' }"
         >
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -293,9 +326,10 @@ onUnmounted(() => {
     <div class="relative z-10 flex flex-1 overflow-hidden">
       <!-- ═══ LEFT SIDEBAR ═══ -->
       <aside
-        class="flex-shrink-0 overflow-y-auto overflow-x-hidden transition-all duration-300 ease-out no-scrollbar hidden md:block"
+        class="flex-shrink-0 overflow-y-auto overflow-x-hidden transition-all duration-300 ease-out no-scrollbar absolute z-40 h-full md:relative md:h-auto"
         :style="{
           width: leftSidebarOpen ? 'var(--sidebar-width)' : '0px',
+          left: 0,
           opacity: leftSidebarOpen ? 1 : 0,
           borderRight: '1px solid var(--border)',
           background: 'var(--glass-bg)',
@@ -319,7 +353,7 @@ onUnmounted(() => {
 
       <!-- ═══ RIGHT SIDEBAR ═══ -->
       <aside
-        class="flex-shrink-0 overflow-y-auto overflow-x-hidden transition-all duration-300 ease-out no-scrollbar hidden md:block"
+        class="flex-shrink-0 overflow-y-auto overflow-x-hidden transition-all duration-300 ease-out no-scrollbar absolute right-0 z-40 h-full md:relative md:h-auto"
         :style="{
           width: rightSidebarOpen ? 'var(--right-panel-width)' : '0px',
           opacity: rightSidebarOpen ? 1 : 0,

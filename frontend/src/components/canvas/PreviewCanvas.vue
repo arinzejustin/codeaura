@@ -13,7 +13,7 @@ const bg = useBackgroundStore()
 const frame = useFrameStore()
 
 // Canvas zoom and pan state
-const zoom = ref(1)
+const zoom = ref(typeof window !== 'undefined' && window.innerWidth < 768 ? 0.6 : 1)
 const panX = ref(0)
 const panY = ref(0)
 const isDragging = ref(false)
@@ -54,25 +54,41 @@ function handleMouseUp() {
     isDragging.value = false
 }
 
-// Touch support for mobile scrolling
+// Touch support for mobile scrolling and zooming
 const lastTouch = ref({ x: 0, y: 0 })
 const isTouching = ref(false)
+const lastTouchDistance = ref(0)
 
 function handleTouchStart(e: TouchEvent) {
     if (e.touches.length === 1) {
         isTouching.value = true
         lastTouch.value = { x: e.touches[0]!.clientX, y: e.touches[0]!.clientY }
+    } else if (e.touches.length === 2) {
+        isTouching.value = true
+        const dx = e.touches[0]!.clientX - e.touches[1]!.clientX
+        const dy = e.touches[0]!.clientY - e.touches[1]!.clientY
+        lastTouchDistance.value = Math.sqrt(dx * dx + dy * dy)
     }
 }
 
 function handleTouchMove(e: TouchEvent) {
-    if (isTouching.value && e.touches.length === 1) {
-        e.preventDefault()
-        const dx = e.touches[0]!.clientX - lastTouch.value.x
-        const dy = e.touches[0]!.clientY - lastTouch.value.y
-        panX.value += dx
-        panY.value += dy
-        lastTouch.value = { x: e.touches[0]!.clientX, y: e.touches[0]!.clientY }
+    if (isTouching.value) {
+        if (e.touches.length === 1) {
+            e.preventDefault()
+            const dx = e.touches[0]!.clientX - lastTouch.value.x
+            const dy = e.touches[0]!.clientY - lastTouch.value.y
+            panX.value += dx
+            panY.value += dy
+            lastTouch.value = { x: e.touches[0]!.clientX, y: e.touches[0]!.clientY }
+        } else if (e.touches.length === 2) {
+            e.preventDefault()
+            const dx = e.touches[0]!.clientX - e.touches[1]!.clientX
+            const dy = e.touches[0]!.clientY - e.touches[1]!.clientY
+            const dist = Math.sqrt(dx * dx + dy * dy)
+            const diff = dist - lastTouchDistance.value
+            zoom.value = Math.max(0.25, Math.min(3, zoom.value + diff * 0.01))
+            lastTouchDistance.value = dist
+        }
     }
 }
 

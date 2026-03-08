@@ -259,88 +259,22 @@
   }
 }
 
-/* ─── ANIMATED BACKGROUND ─── */
+/* ─── CLASSIC DOT BACKGROUND ─── */
 .app-bg {
   position: fixed;
   inset: 0;
   z-index: 0;
-  background: var(--surface-0);
-  overflow: hidden;
+  background-color: var(--surface-0);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.25) 1.5px, transparent 1.5px);
+  background-size: 24px 24px;
 }
 
 .app-bg::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: 
-    radial-gradient(ellipse 600px 400px at 15% 20%, rgba(226, 168, 75, 0.04) 0%, transparent 70%),
-    radial-gradient(ellipse 500px 350px at 85% 75%, rgba(100, 70, 200, 0.03) 0%, transparent 70%),
-    radial-gradient(ellipse 400px 300px at 50% 50%, rgba(226, 168, 75, 0.02) 0%, transparent 70%);
-  animation: bgShift 20s ease-in-out infinite alternate;
-}
-
-.app-bg::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.015'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  opacity: 0.5;
-}
-
-@keyframes bgShift {
-  0% { transform: scale(1) rotate(0deg); }
-  100% { transform: scale(1.05) rotate(1deg); }
-}
-
-/* ─── FLOATING PARTICLES ─── */
-.particle {
-  position: absolute;
-  border-radius: 50%;
+  background: radial-gradient(circle at center, transparent 20%, var(--surface-0) 120%);
   pointer-events: none;
-  opacity: 0;
-  animation: particleFloat 12s ease-in-out infinite;
-}
-
-.particle:nth-child(1) {
-  width: 3px; height: 3px;
-  left: 10%; top: 20%;
-  background: var(--accent);
-  animation-delay: 0s;
-}
-
-.particle:nth-child(2) {
-  width: 2px; height: 2px;
-  left: 30%; top: 60%;
-  background: rgba(100, 70, 200, 0.5);
-  animation-delay: 2s;
-}
-
-.particle:nth-child(3) {
-  width: 4px; height: 4px;
-  left: 70%; top: 30%;
-  background: var(--accent);
-  animation-delay: 4s;
-}
-
-.particle:nth-child(4) {
-  width: 2px; height: 2px;
-  left: 85%; top: 70%;
-  background: rgba(100, 70, 200, 0.4);
-  animation-delay: 6s;
-}
-
-.particle:nth-child(5) {
-  width: 3px; height: 3px;
-  left: 50%; top: 85%;
-  background: var(--accent);
-  animation-delay: 8s;
-}
-
-@keyframes particleFloat {
-  0%, 100% { opacity: 0; transform: translateY(0px); }
-  30% { opacity: 0.6; }
-  50% { opacity: 0.4; transform: translateY(-30px); }
-  80% { opacity: 0.2; }
 }
 
 /* ─── ACCORDION ─── */

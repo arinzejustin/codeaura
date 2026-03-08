@@ -3,8 +3,27 @@
  * HistoryPanel — Auto-saved states with restore and pin functionality.
  */
 import { useHistoryStore } from '../../../stores/history'
+import { useEditorStore } from '../../../stores/editor'
+import { useThemeStore } from '../../../stores/theme'
+import { useBackgroundStore } from '../../../stores/background'
+import { useFrameStore } from '../../../stores/frame'
+import type { HistoryEntry } from '../../../stores/history'
 
 const historyStore = useHistoryStore()
+const editor = useEditorStore()
+const theme = useThemeStore()
+const bg = useBackgroundStore()
+const frame = useFrameStore()
+
+function restore(entry: HistoryEntry) {
+  const c = entry.config
+  if (!c) return
+  if (c.theme) theme.setTheme(c.theme)
+  if (c.code !== undefined) editor.setCode(c.code)
+  if (c.language) editor.setLanguage(c.language)
+  if (c.bg) Object.assign(bg.$state, c.bg)
+  if (c.frame) Object.assign(frame.$state, c.frame)
+}
 
 function formatTime(ts: number) {
   const d = new Date(ts)
@@ -47,6 +66,7 @@ function formatDate(ts: number) {
         v-for="entry in historyStore.entries"
         :key="entry.id"
         class="group flex items-center gap-2 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-150"
+        @click="restore(entry)"
         @mouseenter="($event.currentTarget as HTMLElement).style.background = 'var(--surface-2)'"
         @mouseleave="($event.currentTarget as HTMLElement).style.background = 'transparent'"
       >

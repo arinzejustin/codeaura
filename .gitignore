@@ -24,5 +24,4 @@ dist-ssr
 *.sw?
 .*ruleset
 .env
-.env.example
 migrations

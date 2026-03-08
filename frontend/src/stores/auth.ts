@@ -5,7 +5,7 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 
-const API_URL = import.meta.env.VITE_API_URL || "/api";
+const API_URL: string = import.meta.env.VITE_API_URL || "";
 
 export interface User {
   id: string;
@@ -33,9 +33,7 @@ export const useAuthStore = defineStore("auth", () => {
         user.value = JSON.parse(savedUser);
         accessToken.value = savedToken;
       }
-    } catch {
-      // Ignore parse errors
-    }
+    } catch {}
   }
 
   function saveToStorage() {
