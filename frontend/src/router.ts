@@ -1,4 +1,3 @@
-
 import { createRouter, createWebHistory } from "vue-router";
 
 const router = createRouter({
@@ -18,6 +17,10 @@ const router = createRouter({
       path: "/auth/callback",
       name: "auth-callback",
       component: () => import("./views/AuthCallback.vue"),
+    },
+    {
+      path: "/:pathMatch(.*)*",
+      redirect: "/",
     },
   ],
 });
