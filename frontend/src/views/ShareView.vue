@@ -65,9 +65,11 @@ useHead({
         { property: 'og:title', content: computed(() => `${snapshotTitle.value}`) },
         { property: 'og:description', content: computed(() => `View this ${snapshot.value?.language || 'code'} snippet. Create stunning code screenshots with beautiful themes and custom backgrounds.`) },
         { property: 'og:type', content: 'article' },
+        { property: 'og:image', content: 'https://codeaura.fun/image/view.png' },
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:title', content: computed(() => `${snapshotTitle.value}`) },
-        { name: 'twitter:description', content: computed(() => `View this ${snapshot.value?.language || 'code'} snippet. Create stunning code screenshots with beautiful themes and custom backgrounds.`) }
+        { name: 'twitter:description', content: computed(() => `View this ${snapshot.value?.language || 'code'} snippet. Create stunning code screenshots with beautiful themes and custom backgrounds.`) },
+        { name: 'twitter:image', content: 'https://codeaura.fun/image/view.png' }
     ]
 })
 
