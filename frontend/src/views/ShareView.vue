@@ -59,14 +59,14 @@ const snapshotTitle = computed(() => {
 })
 
 useHead({
-    title: computed(() => `${snapshotTitle.value} | CodeAura`),
+    title: computed(() => `${snapshotTitle.value}`),
     meta: [
         { name: 'description', content: computed(() => `Check out this ${snapshot.value?.language || 'code'} snippet created with CodeAura. Beautiful themes, custom backgrounds, and pixel-perfect export.`) },
-        { property: 'og:title', content: computed(() => `${snapshotTitle.value} | CodeAura`) },
+        { property: 'og:title', content: computed(() => `${snapshotTitle.value}`) },
         { property: 'og:description', content: computed(() => `View this ${snapshot.value?.language || 'code'} snippet. Create stunning code screenshots with beautiful themes and custom backgrounds.`) },
         { property: 'og:type', content: 'article' },
         { name: 'twitter:card', content: 'summary_large_image' },
-        { name: 'twitter:title', content: computed(() => `${snapshotTitle.value} | CodeAura`) },
+        { name: 'twitter:title', content: computed(() => `${snapshotTitle.value}`) },
         { name: 'twitter:description', content: computed(() => `View this ${snapshot.value?.language || 'code'} snippet. Create stunning code screenshots with beautiful themes and custom backgrounds.`) }
     ]
 })
@@ -197,7 +197,7 @@ onMounted(async () => {
 
             <!-- Canvas area -->
             <div class="flex-1 w-full overflow-y-auto">
-                <div class="flex min-h-full w-full p-6 py-10 md:py-16">
+                <div class="flex min-h-full w-full p-2 md:p-6 py-10 md:py-16">
                     <div class="m-auto rounded-2xl max-w-full overflow-hidden flex-shrink-0" :style="bgStyle">
                         <div :style="{ padding: snapshot.config.padding + 'px' }"
                             class="flex items-center justify-center">

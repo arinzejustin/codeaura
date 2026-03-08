@@ -45,7 +45,12 @@ export const useHistoryStore = defineStore("history", () => {
   }
 
   /** Add a new history entry */
-  async function addEntry(entry: Omit<HistoryEntry, "id" | "timestamp" | "pinned" | "syncId" | "synced">) {
+  async function addEntry(
+    entry: Omit<
+      HistoryEntry,
+      "id" | "timestamp" | "pinned" | "syncId" | "synced"
+    >,
+  ) {
     const newEntry: HistoryEntry = {
       ...entry,
       id: `hist-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
@@ -69,6 +74,25 @@ export const useHistoryStore = defineStore("history", () => {
 
     entries.value.unshift(newEntry);
     await addEntryToDB(newEntry as DBHistoryEntry).catch(() => {});
+  }
+
+  /** Update the latest history entry */
+  async function updateLastEntry(entryData: Partial<HistoryEntry>) {
+    // If there's no entry or the latest is pinned (meaning we probably shouldn't mutate it directly as a session), bail out or add new
+    if (entries.value.length === 0 || entries.value[0]?.pinned) {
+      await addEntry(
+        entryData as Omit<
+          HistoryEntry,
+          "id" | "timestamp" | "pinned" | "syncId" | "synced"
+        >,
+      );
+      return;
+    }
+
+    const latest = entries.value[0]!;
+    Object.assign(latest, entryData, { timestamp: Date.now(), synced: false });
+
+    await updateEntryInDB(latest as DBHistoryEntry).catch(() => {});
   }
 
   /** Toggle pin on an entry */
@@ -106,12 +130,12 @@ export const useHistoryStore = defineStore("history", () => {
       if (unsynced.length === 0) return;
 
       // In production, call your API:
-      const apiUrl = import.meta.env.VITE_API_URL || '/api';
+      const apiUrl = import.meta.env.VITE_API_URL || "/api";
       const response = await fetch(`${apiUrl}/history/sync`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth.accessToken}`,
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth.accessToken}`,
         },
         body: JSON.stringify({ entries: unsynced }),
       });
@@ -141,6 +165,7 @@ export const useHistoryStore = defineStore("history", () => {
     entries,
     isSyncing,
     addEntry,
+    updateLastEntry,
     togglePin,
     removeEntry,
     clearHistory,

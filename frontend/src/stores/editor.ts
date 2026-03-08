@@ -1,12 +1,10 @@
-/* ─── EDITOR STORE ─── 
+/* ─── EDITOR STORE ───
  * Manages code content, language, and editor settings.
  */
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
 
-export const useEditorStore = defineStore('editor', () => {
-  // ── State ──
-  const code = ref(`// Welcome to CodeAura ✨
+const defaultCode = `// Welcome to CodeAura ✨
 // The premium code-to-image tool
 
 function fibonacci(n: number): number {
@@ -33,33 +31,38 @@ const sequence = Array.from(
 );
 
 console.log("Fibonacci:", sequence);
-// → [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]`)
+// → [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]`;
 
-  const language = ref('typescript')
-  const fileName = ref('fibonacci.ts')
-  const tabSize = ref(2)
-  const wordWrap = ref(false)
-  const showWhitespace = ref(false)
-  const showIndentGuides = ref(false)
+export const useEditorStore = defineStore("editor", () => {
+  // ── State ──
+  const code = ref(defaultCode);
+
+  const language = ref("typescript");
+  const fileName = ref("fibonacci.ts");
+  const tabSize = ref(2);
+  const wordWrap = ref(false);
+  const showWhitespace = ref(false);
+  const showIndentGuides = ref(false);
 
   // ── Computed ──
-  const lineCount = computed(() => code.value.split('\n').length)
+  const lineCount = computed(() => code.value.split("\n").length);
 
   // ── Actions ──
   function setCode(newCode: string) {
-    code.value = newCode
+    code.value = newCode;
   }
 
   function setLanguage(lang: string) {
-    language.value = lang
+    language.value = lang;
   }
 
   function clearCode() {
-    code.value = ''
+    code.value = "";
   }
 
   return {
     code,
+    defaultCode,
     language,
     fileName,
     tabSize,
@@ -70,5 +73,5 @@ console.log("Fibonacci:", sequence);
     setCode,
     setLanguage,
     clearCode,
-  }
-})
+  };
+});

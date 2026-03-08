@@ -107,8 +107,9 @@ async function trySyncHistory() {
 }
 
 function saveToHistory() {
-  if (!editorStore.code.trim()) return
-  historyStore.addEntry({
+  if (!editorStore.code.trim() || editorStore.code === editorStore.defaultCode) return
+  
+  const payload = {
     themeId: themeStore.currentThemeId,
     language: editorStore.language,
     codePreview: editorStore.code.substring(0, 50).replace(/\s+/g, ' ').trim() + (editorStore.code.length > 50 ? '...' : ''),
@@ -119,7 +120,30 @@ function saveToHistory() {
       code: editorStore.code,
       language: editorStore.language,
     }
-  })
+  }
+
+  const latestEntry = historyStore.entries[0]
+  
+  // Rule: If we have an existing latest entry that isn't pinned, compare lengths
+  // If the new code is more than 30% different in length, it's a "New Session"
+  // Otherwise, it's just a tweak, so we "Update Session"
+  if (latestEntry && !latestEntry.pinned) {
+    const len1 = latestEntry.config.code?.length || 0
+    const len2 = editorStore.code.length
+    
+    // Check if the change is significant (e.g. pasted a whole new block instead of typing ~30 characters)
+    const isSignificantChange = Math.abs(len1 - len2) > Math.max(30, len1 * 0.3)
+    const isDifferentLanguage = latestEntry.language !== editorStore.language && isSignificantChange
+
+    if (isSignificantChange || isDifferentLanguage) {
+      historyStore.addEntry(payload)
+    } else {
+      historyStore.updateLastEntry(payload)
+    }
+  } else {
+    // Start entirely new session if 0 entries or the latest one is specifically pinned
+    historyStore.addEntry(payload)
+  }
 }
 
 function handleKeydown(e: KeyboardEvent) {
@@ -152,12 +176,15 @@ onMounted(() => {
   // Background auto-save loop
   let lastSavedSignature = ''
   autoSaveTimer = setInterval(() => {
-    const currentSignature = editorStore.code.length + themeStore.currentThemeId + bgStore.bgType + frameStore.padding
-    if (currentSignature !== lastSavedSignature) {
-      saveToHistory()
-      lastSavedSignature = currentSignature
+    // Only save if code actually differs from default 'Fibonacci' placeholder
+    if (editorStore.code.trim() && editorStore.code !== editorStore.defaultCode) {
+      const currentSignature = editorStore.code.length + themeStore.currentThemeId + bgStore.bgType + frameStore.padding
+      if (currentSignature !== lastSavedSignature) {
+        saveToHistory()
+        lastSavedSignature = currentSignature
+      }
     }
-  }, 30000)
+  }, 5000)
 
   // Notify of auth errors if redirected from failed sign-in
   const params = new URLSearchParams(window.location.search)
