@@ -47,11 +47,7 @@ app.use("*", limiter);
 app.use(
   "*",
   cors({
-    origin: [
-      process.env.FRONTEND_URL || "https://codeaura.fun",
-      "http://localhost:5173",
-      "http://localhost:4173",
-    ],
+    origin: [process.env.FRONTEND_URL || "http://localhost:5173"],
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,

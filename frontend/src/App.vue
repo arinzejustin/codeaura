@@ -69,6 +69,16 @@ function checkMobile() {
 // User menu dropdown
 const showUserMenu = ref(false)
 
+const showShortcutsModal = ref(false)
+const neverShowShortcutsAgain = ref(false)
+
+function closeShortcutsModal() {
+  showShortcutsModal.value = false
+  if (neverShowShortcutsAgain.value) {
+    localStorage.setItem('hideShortcutsModal', 'true')
+  }
+}
+
 async function handleExport() {
   saveToHistory()
   const el = canvasRef.value?.exportRef
@@ -193,6 +203,13 @@ onMounted(() => {
     toast.error(`Authentication failed: ${error}`, { duration: 5000 })
     // clean up URL string
     window.history.replaceState({}, document.title, window.location.pathname)
+  }
+
+  // Show shortcuts modal on first load if not hidden
+  if (!localStorage.getItem('hideShortcutsModal') && !isMobile.value) {
+    setTimeout(() => {
+      showShortcutsModal.value = true
+    }, 1500)
   }
 })
 
@@ -401,5 +418,68 @@ onUnmounted(() => {
       </aside>
     </div>
   </div>
+
+  <!-- Shortcuts Modal -->
+  <Transition
+    enter-active-class="transition duration-300 ease-out"
+    enter-from-class="opacity-0 scale-95 translate-y-4 sm:translate-y-0"
+    enter-to-class="opacity-100 scale-100 translate-y-0"
+    leave-active-class="transition duration-200 ease-in"
+    leave-from-class="opacity-100 scale-100 translate-y-0"
+    leave-to-class="opacity-0 scale-95 translate-y-4 sm:translate-y-0"
+  >
+    <div 
+      v-if="showShortcutsModal" 
+      class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+      @click.self="closeShortcutsModal"
+    >
+      <div 
+        class="relative w-full max-w-sm rounded-xl p-6 shadow-2xl" 
+        style="background: var(--surface-1); border: 1px solid var(--border); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);"
+      >
+        <div class="mb-5 flex justify-between items-start">
+          <div>
+            <h3 class="text-lg font-bold tracking-tight" style="color: var(--text-primary)">Keyboard Shortcuts</h3>
+            <p class="text-sm mt-1" style="color: var(--text-secondary)">Speed up your workflow with these shortcuts.</p>
+          </div>
+          <button @click="closeShortcutsModal" class="p-1.5 rounded-lg hover:bg-white/10 transition-colors" style="color: var(--text-muted)">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="space-y-3 mb-6">
+          <div class="flex items-center justify-between p-3 rounded-lg" style="background: var(--surface-2); border: 1px solid var(--border)">
+            <span class="text-sm font-medium" style="color: var(--text-primary)">Export Image</span>
+            <div class="flex gap-1.5">
+              <kbd class="px-2 py-1 text-xs font-sans font-medium rounded-md" style="background: var(--surface-0); border: 1px solid var(--border); color: var(--text-primary); box-shadow: 0 2px 0 var(--border)">Ctrl/Cmd</kbd>
+              <kbd class="px-2 py-1 text-xs font-sans font-medium rounded-md" style="background: var(--surface-0); border: 1px solid var(--border); color: var(--text-primary); box-shadow: 0 2px 0 var(--border)">E</kbd>
+            </div>
+          </div>
+          <div class="flex items-center justify-between p-3 rounded-lg" style="background: var(--surface-2); border: 1px solid var(--border)">
+            <span class="text-sm font-medium" style="color: var(--text-primary)">Save Settings</span>
+            <div class="flex gap-1.5">
+              <kbd class="px-2 py-1 text-xs font-sans font-medium rounded-md" style="background: var(--surface-0); border: 1px solid var(--border); color: var(--text-primary); box-shadow: 0 2px 0 var(--border)">Ctrl/Cmd</kbd>
+              <kbd class="px-2 py-1 text-xs font-sans font-medium rounded-md" style="background: var(--surface-0); border: 1px solid var(--border); color: var(--text-primary); box-shadow: 0 2px 0 var(--border)">S</kbd>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between mt-2 pt-4" style="border-top: 1px solid var(--border)">
+          <label class="flex items-center gap-2 cursor-pointer text-sm" style="color: var(--text-secondary)">
+            <input 
+              type="checkbox" 
+              v-model="neverShowShortcutsAgain" 
+              class="rounded w-4 h-4 cursor-pointer focus:ring-[var(--accent)] focus:ring-offset-0 transition-colors"
+              style="background: var(--surface-2); border: 1px solid var(--border); color: var(--accent);"
+            >
+            <span class="select-none cursor-pointer">Don't show this again</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </Transition>
+
   <Toaster position="top-right" theme="dark" richColors />
 </template>
