@@ -481,5 +481,5 @@ onUnmounted(() => {
     </div>
   </Transition>
 
-  <Toaster position="top-right" theme="dark" richColors />
+  <Toaster closeButton position="top-right" theme="dark" richColors />
 </template>
