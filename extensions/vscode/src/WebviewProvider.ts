@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import * as path from 'path';
 
 export class SnapshotWebviewPanel {
   public static currentPanel: SnapshotWebviewPanel | undefined;
@@ -12,14 +11,12 @@ export class SnapshotWebviewPanel {
       ? vscode.ViewColumn.Beside
       : vscode.ViewColumn.One;
 
-    // If we already have a panel, show it.
     if (SnapshotWebviewPanel.currentPanel) {
       SnapshotWebviewPanel.currentPanel._panel.reveal(column);
       SnapshotWebviewPanel.currentPanel.sendUpdate(code, language);
       return;
     }
 
-    // Otherwise, create a new panel.
     const panel = vscode.window.createWebviewPanel(
       'codeauraSnapshot',
       'CodeAura Snapshot',
@@ -37,13 +34,10 @@ export class SnapshotWebviewPanel {
   private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
     this._panel = panel;
 
-    // Set the webview's initial html content
     this._panel.webview.html = this._getHtmlForWebview(this._panel.webview, extensionUri);
 
-    // Listen for when the panel is disposed
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
-    // Handle messages from the webview
     this._panel.webview.onDidReceiveMessage(
       (message: any) => {
         switch (message.command) {
@@ -51,8 +45,6 @@ export class SnapshotWebviewPanel {
             vscode.window.showInformationMessage('Snapshot saved locally (TODO)');
             return;
           case 'login':
-            // Open user's browser to the vscode-login route
-            // In a real app, this should be the deployed CodeAura URL
             const loginUrl = vscode.Uri.parse('https://codeaura.fun/auth/vscode-login');
             vscode.env.openExternal(loginUrl);
             return;
@@ -87,7 +79,6 @@ export class SnapshotWebviewPanel {
     try {
       let html = fs.readFileSync(indexPath.fsPath, 'utf8');
       
-      // Inject the vscode API into the window object so Vue can use it
       const nonce = getNonce();
       const scriptInjection = `<script nonce="${nonce}">window.vscode = acquireVsCodeApi();</script>`;
       html = html.replace('</head>', `${scriptInjection}</head>`);
