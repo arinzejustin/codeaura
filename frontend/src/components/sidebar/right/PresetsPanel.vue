@@ -1,7 +1,5 @@
 <script setup lang="ts">
-/**
- * PresetsPanel — Curated full-config presets with one-click apply.
- */
+import { Github, Star } from 'lucide-vue-next'
 import { defaultPresets, type Preset } from '../../../data/presets'
 import { useThemeStore } from '../../../stores/theme'
 import { useFrameStore } from '../../../stores/frame'
@@ -38,6 +36,26 @@ function getPresetColors(preset: Preset) {
 
 <template>
   <div class="space-y-2">
+    <div class="mb-5 px-1">
+      <a
+        href="https://github.com/arinzejustin/codeaura"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 group"
+        style="background: var(--surface-2); border: 1px solid var(--border-strong)"
+        @mouseenter="($event.currentTarget as HTMLElement).style.background = 'var(--surface-3)'"
+        @mouseleave="($event.currentTarget as HTMLElement).style.background = 'var(--surface-2)'"
+      >
+        <div class="flex items-center gap-3">
+          <Github class="w-4 h-4" style="color: var(--text-primary)" />
+          <div class="flex flex-col">
+            <span class="text-xs font-body font-medium leading-none" style="color: var(--text-primary)">Star on GitHub</span>
+            <span class="text-[10px] font-body mt-1 leading-none" style="color: var(--text-muted)">Support CodeAura</span>
+          </div>
+        </div>
+        <Star class="w-4 h-4 transition-all duration-300 group-hover:text-[#e3b341] group-hover:fill-[#e3b341]" style="color: var(--text-muted)" />
+      </a>
+    </div>
     <h3 class="section-header px-1">Presets</h3>
     <div class="space-y-1">
       <button

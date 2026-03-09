@@ -23,7 +23,7 @@ export class SnapshotWebviewPanel {
       column,
       {
         enableScripts: true,
-        localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'dist-web')] // We will bundle the web UI here
+        localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'dist-web')]
       }
     );
 
