@@ -101,7 +101,12 @@ async function handleCopy() {
 }
 
 function handleLogin() {
-  auth.loginWithGitHub()
+  const isExtension = import.meta.env.VITE_VSCODE_EXT === 'true'
+  if (isExtension && (window as any).vscode) {
+    (window as any).vscode.postMessage({ command: 'login' })
+  } else {
+    auth.loginWithGitHub()
+  }
 }
 
 function handleLogout() {
@@ -211,6 +216,25 @@ onMounted(() => {
       showShortcutsModal.value = true
     }, 1500)
   }
+
+  // Listen for messages from VS Code Webview
+  window.addEventListener('message', async (event) => {
+    const message = event.data;
+    if (message.command === 'updateCode') {
+      editorStore.setCode(message.code);
+      if (message.language) {
+        editorStore.setLanguage(message.language);
+      }
+    } else if (message.command === 'syncAuth') {
+      auth.accessToken = message.token;
+      const success = await auth.fetchMe();
+      if (success) {
+        toast.success('Signed in successfully!');
+      } else {
+        toast.error('Failed to verify session.');
+      }
+    }
+  });
 })
 
 let autoSaveTimer: ReturnType<typeof setInterval>

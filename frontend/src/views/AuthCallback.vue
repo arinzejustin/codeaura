@@ -96,6 +96,16 @@ onMounted(async () => {
       accessToken
     )
 
+    const isVscode = localStorage.getItem('codeaura-auth-source') === 'vscode'
+    
+    if (isVscode) {
+      status.value = 'success'
+      errorMsg.value = 'vs-code-success' // We'll use this to override the UI text
+      localStorage.removeItem('codeaura-auth-source')
+      window.location.href = `vscode://codeaura.codeaura-vscode/auth?token=${accessToken}`
+      return
+    }
+
     status.value = 'success'
     setTimeout(() => router.push('/'), 1000)
   } catch (err: any) {
@@ -123,8 +133,11 @@ onMounted(async () => {
           class="w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold mx-auto bg-green-500/15 text-green-500">
           <CheckIcon class="size-7" />
         </div>
-        <h2 class="text-xl font-semibold mt-4" style="color: var(--text-primary)">Welcome!</h2>
-        <p class="text-sm mt-2" style="color: var(--text-secondary)">Redirecting to CodeAura...</p>
+        <h2 class="text-xl font-semibold mt-4" style="color: var(--text-primary)">Authentication Successful!</h2>
+        <p v-if="errorMsg === 'vs-code-success'" class="text-sm mt-2" style="color: var(--text-secondary)">
+          You can safely close this browser tab and return to VS Code. Prompting to open VS Code...
+        </p>
+        <p v-else class="text-sm mt-2" style="color: var(--text-secondary)">Redirecting to CodeAura...</p>
       </template>
 
       <template v-if="status === 'error'">

@@ -1,7 +1,9 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHistory, createWebHashHistory } from "vue-router";
+
+const isExtension = import.meta.env.VITE_VSCODE_EXT === 'true';
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: isExtension ? createWebHashHistory() : createWebHistory(),
   routes: [
     {
       path: "/",
@@ -17,6 +19,11 @@ const router = createRouter({
       path: "/auth/callback",
       name: "auth-callback",
       component: () => import("./views/AuthCallback.vue"),
+    },
+    {
+      path: "/auth/vscode-login",
+      name: "vscode-login",
+      component: () => import("./views/VscodeLogin.vue"),
     },
     {
       path: "/:pathMatch(.*)*",
