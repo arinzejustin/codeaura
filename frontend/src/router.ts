@@ -12,7 +12,7 @@ const router = createRouter({
     },
     { path: "/code-swap",
       name: "code-swap",
-      component: () => import("./views/CodeSwap.vue"),
+      component: () => import("./views/CodeSwaper.vue"),
     },
     {
       path: "/s/:code",
