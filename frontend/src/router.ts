@@ -10,6 +10,10 @@ const router = createRouter({
       name: "home",
       component: () => import("./App.vue"),
     },
+    { path: "/code-swap",
+      name: "code-swap",
+      component: () => import("./views/CodeSwap.vue"),
+    },
     {
       path: "/s/:code",
       name: "share-viewer",
