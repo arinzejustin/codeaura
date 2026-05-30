@@ -17,7 +17,7 @@ const router = createRouter({
     {
       path: "/s/:code",
       name: "share-viewer",
-      component: () => import("./views/ShareViewer.vue"),
+      component: () => import("./views/ShareView.vue"),
     },
     {
       path: "/auth/callback",
